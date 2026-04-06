@@ -1,0 +1,21 @@
+venv/
+env/
+ENV/
+
+.idea/
+.vscode/
+
+Thumbs.db
+ehthumbs.db
+.DS_Store
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+__numba_cache__/
+
+# *.compressed
+# *.rle
+# *.mp4
