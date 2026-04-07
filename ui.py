@@ -9,7 +9,7 @@ from compression import compress_universal, save_compressed_file, decompress_uni
 from image_processing import rotate_image, crop_image, apply_median_blur, apply_otsu_threshold, calculate_bone_mass, \
     apply_canny_edge_detection
 
-from image_processing import rotate_image, crop_image, apply_clahe, apply_sharpening, get_histogram_data
+from image_processing import apply_clahe, apply_sharpening, get_histogram_data
 
 def render_ui():
     # initializam istoricul daca nu exista
@@ -113,10 +113,22 @@ def render_ui():
                 st.write("Medical AI Analysis:")
                 
                 if st.button("Sharpen (Unsharp Masking)", use_container_width=True):
+                    progress_text = "Loading..."
+                    my_bar = st.progress(0, text=progress_text)
+                    for percent_complete in range(100):
+                        time.sleep(0.01)
+                        my_bar.progress(percent_complete + 1, text=f"{progress_text} {percent_complete}%")
                     apply_action(apply_sharpening)
+                    my_bar.empty()
                     st.toast("Clarity increased with Unsharp Masking!")
                 if st.button("✨ Apply CLAHE (Contrast)", use_container_width=True):
+                    progress_text = "Loading..."
+                    my_bar = st.progress(0, text=progress_text)
+                    for percent_complete in range(100):
+                        time.sleep(0.01)
+                        my_bar.progress(percent_complete + 1, text=f"{progress_text} {percent_complete}%")
                     apply_action(apply_clahe)
+                    my_bar.empty()
                     st.toast("CLAHE contrast applied!")
 
                 if st.button("🧼 Median Blur (Denoise)", use_container_width=True):
@@ -125,7 +137,7 @@ def render_ui():
                     for percent_complete in range(100):
                         time.sleep(0.01)
                         my_bar.progress(percent_complete + 1, text=f"{progress_text} {percent_complete}%")
-                    st.session_state.current_image = apply_median_blur(st.session_state.current_image)
+                    apply_action(apply_median_blur)
                     my_bar.empty()
                     st.toast("Noise removed!")
 
@@ -136,9 +148,8 @@ def render_ui():
                         time.sleep(0.01)
                         my_bar.progress(percent_complete + 1, text=f"{progress_text} {percent_complete}%")
 
-                    binary_result = apply_otsu_threshold(st.session_state.current_image)
-                    st.session_state.current_image = binary_result
-                    st.session_state.bone_mass = calculate_bone_mass(binary_result)
+                    apply_action(apply_otsu_threshold)
+                    st.session_state.bone_mass = calculate_bone_mass(st.session_state.current_image)
 
                     my_bar.empty()
                     st.toast("Segmentation complete!")
@@ -150,7 +161,7 @@ def render_ui():
                         time.sleep(0.01)
                         my_bar.progress(percent_complete + 1, text=f"{progress_text} {percent_complete}%")
 
-                    st.session_state.current_image = apply_canny_edge_detection(st.session_state.current_image)
+                    apply_action(apply_canny_edge_detection)
                     my_bar.empty()
                     st.toast("Edges detected!")
 
@@ -235,7 +246,6 @@ def render_ui():
                 if st.button("Generate Diagnostic Video", use_container_width=True):
                     if len(st.session_state.history) > 0:
                         from image_processing import create_diagnostic_video
-                        import os
                         with st.spinner("Rendering video..."):
                             folder = "video"
                             # trimitem istoricul si imaginea originala catre functia din image_processing
@@ -263,9 +273,6 @@ def render_ui():
 
             st.divider()
 
-        st.markdown("**Lossless Archive (RLE)**")
-        if st.button("📦 Compress & Save", type="primary", use_container_width=True):
-            st.write("Compressing file...")
         st.markdown("**Lossless Archive (Huffman)**")
 
         if st.button("📦 Compress & Archive", type="primary", use_container_width=True):
