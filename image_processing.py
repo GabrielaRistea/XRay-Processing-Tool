@@ -87,3 +87,31 @@ def get_histogram_data(img):
     # calculam histograma
     hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
     return hist
+def apply_median_blur(img, ksize=5):
+    return cv2.medianBlur(img, ksize)
+
+def apply_otsu_threshold(img):
+    if len(img.shape) == 3:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = img
+
+    _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return thresh
+
+def calculate_bone_mass(binary_img):
+    white_pixels = np.sum(binary_img == 255)
+    total_pixels = binary_img.size
+    percentage = (white_pixels / total_pixels) * 100
+    return round(percentage, 2)
+
+
+def apply_canny_edge_detection(img):
+    if len(img.shape) == 3:
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = img
+
+    edges = cv2.Canny(gray, 50, 150)
+
+    return edges
